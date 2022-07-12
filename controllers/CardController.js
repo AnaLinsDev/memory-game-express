@@ -1,8 +1,25 @@
 const Card = require("../models/Card.js");
+const { Sequelize } = require("sequelize");
 
 module.exports = {
-  async getAll(req, res) {
-    const cards = await Card.findAll();
+  async getHardMode(req, res) {
+    const cards = await Card.findAll({ order: Sequelize.literal("random()") });
+    return res.json(cards);
+  },
+
+  async getNormalMode(req, res) {
+    const cards = await Card.findAll({
+      limit: 6,
+      order: Sequelize.literal("random()"),
+    });
+    return res.json(cards);
+  },
+
+  async getEasyMode(req, res) {
+    const cards = await Card.findAll({
+      limit: 4,
+      order: Sequelize.literal("random()"),
+    });
     return res.json(cards);
   },
 

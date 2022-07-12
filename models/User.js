@@ -1,5 +1,6 @@
 const { Model, DataTypes } =  require('sequelize')
 const sequelize = require("../database");
+const Game = require("./Game")
 
 class User extends Model {}
 
@@ -9,19 +10,24 @@ class User extends Model {}
 */
 User.init({
     username: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
     },
     email: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
     },
     password: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
     }
 },
 {
     sequelize, 
-    modelName: 'user',
+    modelName: 'User',
     // timestamps: false
 })
+
+User.hasMany(Game, { foreignKey: 'userId' })
 
 module.exports = User

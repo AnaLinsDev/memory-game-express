@@ -7,12 +7,22 @@ module.exports = {
   },
 
   async getByUserId(req, res) {
-    const reqUserId = req.params.userId;
-    const games = await Game.findAll({ where: { userId: reqUserId } });
-    return res.json(games);
+    try {
+      const reqUserId = req.params.userId;
+      const games = await Game.findAll({ where: { userId: reqUserId } });
+      return res.json(games);
+    } catch (err) {
+      return res.status(500).send({error: "Something wrong happened, try again."});
+    }
   },
   async create(req, res) {
-    const game = await Game.create(req.body);
-    return res.json(game);
+    try {
+      const reqUserId = req.params.userId;
+      console.log(reqUserId)
+      const game = await Game.create({...req.body, userId: reqUserId});
+      return res.json(game);
+    } catch (err) {
+      return res.status(500).send({error: "Something wrong happened, try again."});
+    }
   },
 };

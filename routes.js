@@ -13,11 +13,14 @@ routes.post("/login", UserController.login );
 routes.put("/users/:id", UserController.update );
 routes.delete("/users/:id", UserController.delete );
 
-routes.get("/game", CardController.getAll);
+routes.get("/game/hard", CardController.getHardMode);
+routes.get("/game/normal", CardController.getNormalMode);
+routes.get("/game/easy", CardController.getEasyMode);
+
 routes.post("/povoate_cards", CardController.povoate);
 
 routes.get("/games/:userId", GameController.getByUserId );
-routes.post("/games", GameController.create );
+routes.post("/games/:userId", GameController.create );
 
 module.exports = routes;
 

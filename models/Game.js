@@ -1,37 +1,32 @@
 const { Model, DataTypes } =  require('sequelize')
 const sequelize = require("../database");
-const User = require("./User.js");
 
 class Game extends Model {}
 
 Game.init({
     maxAttempts: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
     attempts: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
     isWinner: {
-        type: DataTypes.BOOLEAN
+        type: DataTypes.BOOLEAN,
+        allowNull: false
     },
     difficulty: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
     },
     date: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
     },
     time: {
-        type: DataTypes.STRING
-    },
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        onDelete: 'CASCADE',
-        references: {
-          model: 'Users',
-          key: 'id',
-          as: 'userId'
-        }
+        type: DataTypes.STRING,
+        allowNull: false
     }
 },
 {
