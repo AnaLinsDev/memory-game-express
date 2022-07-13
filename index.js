@@ -4,6 +4,8 @@ const routes = require('./routes');
 
 sequelize.sync().then(() => console.log("DB IS READY"));
 
+const port = process.env.PORT || 8000
+
 const app = express();
 var cors = require('cors')
 
@@ -11,7 +13,7 @@ app.use(express.json());
 app.use(cors())
 app.use(routes);
 
-app.listen(8000, () => {
+app.listen(port, () => {
   console.log("APP IS RUNNING");
 });
 
