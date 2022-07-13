@@ -6,7 +6,8 @@ class Card extends Model {}
 Card.init({
     icon: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     }
 },
 {

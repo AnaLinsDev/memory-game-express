@@ -16,7 +16,6 @@ routes.delete("/users/:id", UserController.delete );
 routes.get("/game/hard", CardController.getHardMode);
 routes.get("/game/normal", CardController.getNormalMode);
 routes.get("/game/easy", CardController.getEasyMode);
-
 routes.post("/povoate_cards", CardController.povoate);
 
 routes.get("/games/:userId", GameController.getByUserId );
