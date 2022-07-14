@@ -12,8 +12,8 @@ module.exports = {
   },
 
   async getByUserId(req, res) {
+    const userId = req.params.id;
     try {
-      const userId = req.params.id;
       const games = await Game.findAll({ where: { userId } });
       return res.json(games);
     } catch (err) {
@@ -24,6 +24,7 @@ module.exports = {
   },
 
   async create(req, res) {
+    const userId = req.params.id;
     try {
       const game = await Game.create({ ...req.body, userId });
       return res.json(game);
