@@ -1,5 +1,11 @@
 const User = require("../models/User.js");
 
+const serverError = {
+  status: 500,
+  message: "Something wrong happened, try again."
+}
+
+
 module.exports = {
   async getAll(req, res) {
     const users = await User.findAll();
@@ -7,18 +13,12 @@ module.exports = {
   },
 
   async login(req, res) {
-    const usernameReq = req.body.username;
-    const passwordReq = req.body.password;
+    const { username, password } = req.body;
     try {
-      const user = await User.findOne({
-        where: { username: usernameReq, password: passwordReq },
-      });
-      if (user === null) {
-        throw new Error()
-      }
+      const user = await User.findOne({ where: { username, password } });
       return res.json(user);
     } catch (err) {
-      return res.status(404).send({error: "User and password don't match. Try again."});
+      return res.status(serverError.status).send({error: serverError.message});
     }
   },
 
@@ -26,12 +26,9 @@ module.exports = {
     const id = req.params.id;
     try {
       const user = await User.findOne({ where: { id: id } });
-      if (user === null) {
-        throw new Error()
-      }
       return res.json(user);
     } catch (err) {
-      return res.status(404).send({error: "User not found. Try again."});
+      return res.status(serverError.status).send({error: serverError.message});
     }
   },
 
@@ -40,24 +37,22 @@ module.exports = {
       const user = await User.create(req.body);
       return res.json(user);
     } catch (err) {
-      return res.status(500).send({error: "Something wrong happened, try again."});
+      return res.status(serverError.status).send({error: serverError.message});
     }
   },
 
   async update(req, res) {
     const id = req.params.id;
+    const { username, email, password } = req.body;
     try {
       const user = await User.findOne({ where: { id: id } });
-      user.username = req.body.username;
-      user.email = req.body.email;
-      user.password = req.body.password;
-      if (user === null) {
-        throw new Error()
-      }
+      user.username = username;
+      user.email = email;
+      user.password = password;
       await user.save();
       return res.json(user);
     } catch (err) {
-      return res.status(404).send({error: "User not found. Try again."});
+      return res.status(serverError.status).send({error: serverError.message});
     }
   },
 
@@ -67,7 +62,7 @@ module.exports = {
       await User.destroy({ where: { id: id } });
       return res.json({ message: "removed" });
     } catch (err) {
-      return res.status(500).send({error: "Something wrong happened, try again."});
+      return res.status(serverError.status).send({error: serverError.message});
     }
   },
 };
