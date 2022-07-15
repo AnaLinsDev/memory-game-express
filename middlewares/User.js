@@ -1,72 +1,99 @@
 const ENUM_CODES = require("../enums/codes.js");
 const User = require("../models/User.js");
-const { Sequelize } = require('sequelize')
+const Config = require("../models/Config.js");
+const Cryptography = require("../cryptography.js");
+const { Sequelize } = require("sequelize");
 
-const Op = Sequelize.Op
+const Op = Sequelize.Op;
 
 const userExists = async (req, res, next) => {
-    const id = req.params.id;
-    const user = await User.findOne({ where: { id: id } });
-      if (user === null) {
-        return res.status(ENUM_CODES.ERROR.NOT_FOUND).json({ message: 'User not found' });
-      }
-    next();
-}
+  const id = req.params.id;
+  const user = await User.findOne({ where: { id: id } });
+  if (user === null) {
+    return res
+      .status(ENUM_CODES.ERROR.NOT_FOUND)
+      .json({ message: "User not found" });
+  }
+  next();
+};
 
 const userLogin = async (req, res, next) => {
-    const { username, password } = req.body;
-    const user = await User.findOne({
-        where: { username, password },
-      });
-      if (user === null) {
-        return res.status(ENUM_CODES.ERROR.NOT_FOUND).json({ message: 'User not found, try again.' });
-      }
-    next();
-}
+  let { username, password } = req.body;
+
+  let salt = await Config.findOne();
+  
+  if (!salt) {
+    return res.status(ENUM_CODES.ERROR.SERVER).send({error: 'Crypto Key was lost, create another account !'});
+  } else {
+    salt = salt.salt
+  }
+
+  let passwordLogin = Cryptography.sha512(password, salt);
+  const user = await User.findOne({ where: { username } });
+
+  if (user === null) {
+    return res
+      .status(ENUM_CODES.ERROR.NOT_FOUND)
+      .json({ message: "User not found, try again." });
+  } else if (user.password !== passwordLogin.hash) {
+    return res
+      .status(ENUM_CODES.ERROR.BAD_REQUEST)
+      .json({ message: "User and Password don't match, try again." });
+  }
+  next();
+};
 
 const userRegister = async (req, res, next) => {
-    const { username, email } = req.body;
-    const usernameUsed = await User.findOne({
-        where: { username },
-      });
-      if (usernameUsed !== null) {
-        return res.status(ENUM_CODES.ERROR.BAD_REQUEST).json({ message: 'Username is already been used, try another one.' });
-      }
+  const { username, email } = req.body;
+  const usernameUsed = await User.findOne({
+    where: { username },
+  });
+  if (usernameUsed !== null) {
+    return res
+      .status(ENUM_CODES.ERROR.BAD_REQUEST)
+      .json({ message: "Username is already been used, try another one." });
+  }
 
-      const emailUsed = await User.findOne({
-        where: { email },
-      });
-      if (emailUsed !== null) {
-        return res.status(ENUM_CODES.ERROR.BAD_REQUEST).json({ message: 'Email is already been used, try another one.' });
-      }
-    next();
-}
+  const emailUsed = await User.findOne({
+    where: { email },
+  });
+  if (emailUsed !== null) {
+    return res
+      .status(ENUM_CODES.ERROR.BAD_REQUEST)
+      .json({ message: "Email is already been used, try another one." });
+  }
+  next();
+};
 
 const userUpdate = async (req, res, next) => {
-    const id = req.params.id;
-    const { username, email } = req.body;
-    const usernameUsed = await User.findOne({
-        where: { username, id: {[Op.notIn]:[id]} },
-      });
-      if (usernameUsed !== null) {
-        return res.status(ENUM_CODES.ERROR.BAD_REQUEST).json({ message: 'Username is already been used, try another one.' });
-      }
+  const id = req.params.id;
+  const { username, email } = req.body;
+  const usernameUsed = await User.findOne({
+    where: { username, id: { [Op.notIn]: [id] } },
+  });
+  if (usernameUsed !== null) {
+    return res
+      .status(ENUM_CODES.ERROR.BAD_REQUEST)
+      .json({ message: "Username is already been used, try another one." });
+  }
 
-      const emailUsed = await User.findOne({
-        where: { email, id: {[Op.notIn]:[id]} },
-      });
-      if (emailUsed !== null) {
-        return res.status(ENUM_CODES.ERROR.BAD_REQUEST).json({ message: 'Email is already been used, try another one.' });
-      }
-    next();
-}
+  const emailUsed = await User.findOne({
+    where: { email, id: { [Op.notIn]: [id] } },
+  });
+  if (emailUsed !== null) {
+    return res
+      .status(ENUM_CODES.ERROR.BAD_REQUEST)
+      .json({ message: "Email is already been used, try another one." });
+  }
+  next();
+};
 
 const validateUsername = (req, res, next) => {
   const { username } = req.body;
   if (!username || username === "") {
     return res
       .status(ENUM_CODES.ERROR.BAD_REQUEST)
-      .json({ message: 'username is required' });
+      .json({ message: "username is required" });
   }
   next();
 };
@@ -77,7 +104,7 @@ const validateEmail = (req, res, next) => {
   if (!email || email === "") {
     return res
       .status(ENUM_CODES.ERROR.BAD_REQUEST)
-      .json({ message: 'email is required' });
+      .json({ message: "email is required" });
   }
 
   const emailValidation = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i;
@@ -96,7 +123,9 @@ const validatePassword = (req, res, next) => {
   const { password } = req.body;
 
   if (!password || password === "") {
-    return res.status(ENUM_CODES.ERROR.BAD_REQUEST).json({ message: 'password is required' });
+    return res
+      .status(ENUM_CODES.ERROR.BAD_REQUEST)
+      .json({ message: "password is required" });
   }
 
   next();
@@ -109,5 +138,5 @@ module.exports = {
   userExists,
   userLogin,
   userRegister,
-  userUpdate
+  userUpdate,
 };
