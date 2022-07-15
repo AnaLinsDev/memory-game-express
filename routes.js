@@ -10,6 +10,7 @@ const UserController = require("./controllers/UserController.js");
 const routes = express.Router();
 
 routes.get("/users", UserController.getAll);
+routes.get("/user/rank", UserController.getRank);
 routes.get("/users/:id", UserMiddleware.userExists, UserController.getById);
 routes.post(
   "/register",

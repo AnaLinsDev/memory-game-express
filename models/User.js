@@ -21,6 +21,10 @@ User.init({
     password: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    victories: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 },
 {

@@ -12,6 +12,11 @@ module.exports = {
     return res.json(users);
   },
 
+  async getRank(req, res) {
+    const users = await User.findAll({ order: [['victories', 'DESC']] });
+    return res.json(users);
+  },
+
   async login(req, res) {
     const { username, password } = req.body;
     try {
@@ -34,6 +39,7 @@ module.exports = {
 
   async create(req, res) {
     try {
+      req.body.victories = 0
       const user = await User.create(req.body);
       return res.json(user);
     } catch (err) {
@@ -51,6 +57,18 @@ module.exports = {
       user.password = password;
       await user.save();
       return res.json(user);
+    } catch (err) {
+      return res.status(serverError.status).send({error: serverError.message});
+    }
+  },
+
+  async updateVictories(userId, victories) {
+    const id = userId;
+    try {
+      const user = await User.findOne({ where: { id: id } });
+      user.victories = victories;
+      await user.save();
+      return user;
     } catch (err) {
       return res.status(serverError.status).send({error: serverError.message});
     }

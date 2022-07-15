@@ -1,4 +1,5 @@
 const Game = require("../models/Game.js");
+const UserController = require("./UserController.js");
 
 const serverError = {
   status: 500,
@@ -27,6 +28,11 @@ module.exports = {
     const userId = req.params.id;
     try {
       const game = await Game.create({ ...req.body, userId });
+
+      // Generate new 'victories'
+      const won = await Game.findAll({ where: { userId, isWinner: true } });
+      await UserController.updateVictories(userId, won.length)
+
       return res.json(game);
     } catch (err) {
       return res
